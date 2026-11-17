@@ -6,6 +6,10 @@ import de.hsd.inflab.parkinggarage.parking.gate.impl.EntranceGate;
 import de.hsd.inflab.parkinggarage.models.Receipt;
 import de.hsd.inflab.parkinggarage.models.ticket.Ticket;
 import de.hsd.inflab.parkinggarage.parking.gate.impl.ExitGate;
+import de.hsd.inflab.parkinggarage.parking.gate.impl.R1;
+import de.hsd.inflab.parkinggarage.parking.gate.impl.R2;
+import de.hsd.inflab.parkinggarage.parking.gate.impl.R3;
+import de.hsd.inflab.parkinggarage.parking.gate.impl.R4;
 import de.hsd.inflab.parkinggarage.simulator.SimClock;
 import de.hsd.inflab.parkinggarage.models.vehicles.Vehicle;
 
@@ -36,12 +40,20 @@ public class Lot {
 
     //  Tragen Sie hier Ihre eigenen Einfahrt- bzw. Ausfahrt-Klassen ein, damit sie
     //  in der GUI auswaehlbar werden. Die jeweils erste Klasse ist der Standard. ----
-    public static List<Entrance> availableEntrances() {
-        return List.of(new EntranceGate() /*, new IhreEinfahrtRegel() */);
-    }
+   public static List<Entrance> availableEntrances() {
+    return List.of(
+        new EntranceGate(),
+        new R1(),
+        new R2()
+    );
+}
 
     public static List<Exit> availableExits() {
-        return List.of(new ExitGate() /*, new IhreAusfahrtRegel() */);
+        return List.of(
+            new ExitGate(),
+            new R3(),
+            new R4()
+        );
     }
     //-----------------------------------
 
@@ -61,15 +73,27 @@ public class Lot {
         this.exit = exit;
     }
 
-    public Ticket enter(Vehicle vehicle) {
-        Ticket ticket = entrance.processIncoming();
+    /*public Ticket enter(Vehicle vehicle) {
+        Ticket ticket = entrance.processIncoming(this, vehicle);
         if (ticket.isValid())
             assignSpot(vehicle);
+        return ticket;
+    }*/
+
+    public Ticket enter(Vehicle vehicle) {
+
+        Ticket ticket =
+            entrance.processIncoming(this, vehicle, clock);
+
+        if (ticket.isValid()) {
+            assignSpot(vehicle);
+        }
+
         return ticket;
     }
 
     public Receipt exit(Ticket ticket, Vehicle vehicle) {
-        Receipt receipt = exit.processOutgoing();
+        Receipt receipt = exit.processOutgoing(ticket, vehicle, clock);
         releaseSpot(vehicle);
         return receipt;
     }
